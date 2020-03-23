@@ -8,13 +8,15 @@ def mainscreen
 
 require 'net/http'
 require 'json'
-require 'dotenv/load'
 
 # App Menu
 
 mb = menubar
 helpmenu = menu "Help"
 settingsitem = menuitem "Settings", key: "control_s" do
+  window do
+    @source = list_box :items => ["Bing", "Google Earth", "Place Kitten", "Lorem Picsum"]
+  end
 end
 helpmenu << settingsitem
 updateitem = menuitem "Check for Updates" do
@@ -35,10 +37,10 @@ helpmenu << aboutitem
 mb << helpmenu
 
 @loc = "en-AU"
-@source = "Bing"
 
-if @source == "Bing"
-  url = URI(ENV['BING_API']+ "#{@loc}.json")
+if @source.text == "Bing"
+  @bing = URI(ENV['BING_API'])
+  url =  "#{@bing}#{@loc}.json"
   response = Net::HTTP.get(url)
   data = JSON.parse(response)
 
@@ -55,7 +57,7 @@ if @source == "Bing"
     info "Done downloading image"
   end
 
-elsif @source == "Gearth"
+elsif @source.text == "Google Earth"
   url = IO.read("lib/json/earthview.json")
   data = JSON.parse(url)
   value = rand(0..1519)
